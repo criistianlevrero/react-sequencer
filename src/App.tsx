@@ -5,10 +5,15 @@ import './App.css'
 import { useNoteDispatcher } from './hooks'
 import type { Event, Note, NotePlayerTypeUnion } from './model'
 import { NotePlayerType } from './model'
+import { Button, Checkbox, Switch } from './components'
+import { ComponentsDemo } from './pages/ComponentsDemo'
 
 function App() {
   const [count, setCount] = useState(0)
   const [selectedPlayerType, setSelectedPlayerType] = useState<NotePlayerTypeUnion>(NotePlayerType.SINE_WAVE)
+  const [enableEffects, setEnableEffects] = useState(false)
+  const [autoplay, setAutoplay] = useState(false)
+  const [showDemo, setShowDemo] = useState(false)
   const { dispatchNote, availablePlayerTypes } = useNoteDispatcher()
 
   const playRandomNote = () => {
@@ -87,20 +92,58 @@ function App() {
             ))}
           </select>
         </div>
+
+        <div className="space-y-4">
+          <div className="flex gap-4 items-center">
+            <Button onClick={() => setCount((count) => count + 1)}>
+              count is {count}
+            </Button>
+            <Button variant="secondary" onClick={playRandomNote}>
+              🎵 Play Random Note
+            </Button>
+            <Button variant="outline" onClick={playSequence}>
+              🎼 Play Sequence
+            </Button>
+          </div>
+
+          <div className="space-y-3">
+            <Checkbox
+              checked={enableEffects}
+              onChange={setEnableEffects}
+              label="Enable Audio Effects"
+              description="Apply reverb and delay to played notes"
+            />
+            
+            <Switch
+              checked={autoplay}
+              onChange={setAutoplay}
+              label="Autoplay Mode"
+              description="Automatically play sequences"
+              size="md"
+            />
+          </div>
+
+          <div className="mt-6">
+            <Button 
+              variant="ghost" 
+              onClick={() => setShowDemo(!showDemo)}
+            >
+              {showDemo ? 'Hide' : 'Show'} Components Demo
+            </Button>
+          </div>
+        </div>
         
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <button onClick={playRandomNote} style={{ marginLeft: '10px' }}>
-          🎵 Play Random Note
-        </button>
-        <button onClick={playSequence} style={{ marginLeft: '10px' }}>
-          🎼 Play Sequence
-        </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
+      
+      {showDemo && (
+        <div className="mt-8">
+          <ComponentsDemo />
+        </div>
+      )}
+      
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
