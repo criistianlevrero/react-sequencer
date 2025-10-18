@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNoteDispatcher } from '../hooks';
 import type { Event, Note, NotePlayerTypeUnion } from '../model';
 import { NotePlayerType } from '../model';
-import { Button, Checkbox, Switch } from '../components';
+import { Button, Card, Checkbox, Switch } from '../components';
 
 export const Sequencer: React.FC = () => {
   const [selectedPlayerType, setSelectedPlayerType] = useState<NotePlayerTypeUnion>(NotePlayerType.SINE_WAVE);
@@ -73,19 +73,19 @@ export const Sequencer: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 transition-colors">
+        <Card>
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 transition-colors">Audio Engine Settings</h2>
             
             <div className="mb-6">
-              <label htmlFor="player-select" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="player-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
                 Audio Engine
               </label>
               <select 
                 id="player-select"
                 value={selectedPlayerType} 
                 onChange={(e) => setSelectedPlayerType(e.target.value as NotePlayerTypeUnion)}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
               >
                 {availablePlayerTypes.map((type) => (
                   <option key={type} value={type}>
@@ -113,8 +113,8 @@ export const Sequencer: React.FC = () => {
             </div>
           </div>
 
-          <div className="border-t pt-8">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Controls</h3>
+          <div className="border-t dark:border-gray-700 pt-8 transition-colors">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 transition-colors">Controls</h3>
             
             <div className="flex flex-wrap gap-4">
               <Button 
@@ -143,16 +143,16 @@ export const Sequencer: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-2">Quick Tips:</h4>
-            <ul className="text-sm text-gray-600 space-y-1">
+          <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors">
+            <h4 className="font-medium text-gray-900 dark:text-white mb-2 transition-colors">Quick Tips:</h4>
+            <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1 transition-colors">
               <li>• Use "Play Random Note" to test individual notes</li>
               <li>• "Play Sequence" demonstrates a C major chord progression</li>
               <li>• Enable effects for enhanced audio experience</li>
               <li>• Switch audio engines to hear different sound types</li>
             </ul>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
