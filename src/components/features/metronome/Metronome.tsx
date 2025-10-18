@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { usePlayhead } from '../contexts';
-import { Button } from './Button';
+import { usePlayhead } from '../../../contexts';
+import { Button } from '../../Button';
 
 export interface MetronomeProps {
   onTick: () => void; // Función que se ejecuta en cada tick del metrónomo

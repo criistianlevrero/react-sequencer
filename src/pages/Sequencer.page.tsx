@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePlayhead } from '../contexts';
-import { Button, Card } from '../components';
+import { Button, Card, Sequencer } from '../components';
 
 export const SequencerPage: React.FC = () => {
   const playhead = usePlayhead();
@@ -86,6 +86,11 @@ export const SequencerPage: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Sequencer Component */}
+          <div className="border-t dark:border-gray-700 pt-8 mt-8">
+            <Sequencer />
           </div>
         </Card>
       </div>

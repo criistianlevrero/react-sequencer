@@ -18,4 +18,8 @@ export { BaseLayout } from './layouts/BaseLayout';
 export { SequencerLayout } from './layouts/SequencerLayout';
 export { ThemeSwitch } from './navigation/ThemeSwitch';
 
-export { Metronome } from './Metronome';
+export { Metronome } from './features/metronome';
+export type { MetronomeProps } from './features/metronome';
+
+export { Sequencer } from './features/sequencer';
+export type { SequencerProps } from './features/sequencer';
