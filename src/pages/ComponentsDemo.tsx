@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Button, Card, Checkbox, Switch } from '../components';
+import { SunIcon, MoonIcon, ComputerDesktopIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { Button, Card, Checkbox, Switch, Select } from '../components';
 
 export const ComponentsDemo: React.FC = () => {
   const [checked, setChecked] = useState(false);
   const [enabled, setEnabled] = useState(true);
   const [secondChecked, setSecondChecked] = useState(true);
   const [notifications, setNotifications] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('option1');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors">
@@ -196,6 +198,94 @@ export const ComponentsDemo: React.FC = () => {
                       description="This feature is always enabled"
                       size="md"
                     />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Select Section */}
+          <Card>
+            <div className="flex items-center mb-8">
+              <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900 rounded-xl flex items-center justify-center mr-4 transition-colors">
+                <span className="text-xl">📋</span>
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors">Select Dropdown</h2>
+                <p className="text-gray-600 dark:text-gray-300 transition-colors">Custom select components with dark mode support</p>
+              </div>
+            </div>
+            
+            <div className="space-y-8">
+              {/* Basic Select */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 transition-colors">Basic Usage</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <Select
+                      value={selectedOption}
+                      onChange={setSelectedOption}
+                      label="Choose an option"
+                      options={[
+                        { value: 'option1', label: 'First Option', icon: HeartIcon },
+                        { value: 'option2', label: 'Second Option', icon: SunIcon },
+                        { value: 'option3', label: 'Third Option', icon: MoonIcon },
+                        { value: 'option4', label: 'Fourth Option', icon: ComputerDesktopIcon }
+                      ]}
+                    />
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <Select
+                      value=""
+                      onChange={() => {}}
+                      label="Disabled Select"
+                      placeholder="Select an option..."
+                      disabled
+                      options={[
+                        { value: 'disabled1', label: 'Disabled Option 1' },
+                        { value: 'disabled2', label: 'Disabled Option 2' }
+                      ]}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Select Features */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 transition-colors">Features</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <Select
+                      value={selectedOption}
+                      onChange={setSelectedOption}
+                      label="Audio Engine Type"
+                      options={[
+                        { value: 'sine_wave', label: 'SINE WAVE', icon: SunIcon },
+                        { value: 'sampler', label: 'SAMPLER', icon: HeartIcon },
+                        { value: 'midi_output', label: 'MIDI OUTPUT', icon: ComputerDesktopIcon }
+                      ]}
+                    />
+                    <p className="text-sm text-gray-600 dark:text-gray-400 transition-colors">
+                      Perfect dark mode compatibility with smooth animations
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <Select
+                      value="favorites"
+                      onChange={() => {}}
+                      label="Theme Preference"
+                      options={[
+                        { value: 'light', label: 'Light Theme', icon: SunIcon },
+                        { value: 'dark', label: 'Dark Theme', icon: MoonIcon },
+                        { value: 'auto', label: 'System Preference', icon: ComputerDesktopIcon },
+                        { value: 'favorites', label: 'Custom Themes', icon: HeartIcon }
+                      ]}
+                    />
+                    <p className="text-sm text-gray-600 dark:text-gray-400 transition-colors">
+                      Accessible keyboard navigation and screen reader support
+                    </p>
                   </div>
                 </div>
               </div>

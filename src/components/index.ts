@@ -10,6 +10,9 @@ export type { CheckboxProps } from './form/Checkbox';
 export { Switch } from './form/Switch';
 export type { SwitchProps } from './form/Switch';
 
+export { Select } from './form/Select';
+export type { SelectProps, SelectOption } from './form/Select';
+
 export { Navigation } from './navigation/Navigation';
 export { BaseLayout as Layout } from './layouts/BaseLayout';
 export { ThemeSwitch } from './navigation/ThemeSwitch';

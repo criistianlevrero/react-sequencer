@@ -28,10 +28,10 @@ export const Checkbox: React.FC<CheckboxProps> = ({
         disabled={disabled}
         className={clsx(
           'group relative flex h-5 w-5 items-center justify-center rounded border-2 transition-colors duration-200',
-          'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
+          'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800',
           checked 
-            ? 'bg-blue-600 border-blue-600' 
-            : 'bg-white border-gray-300 hover:border-gray-400',
+            ? 'bg-blue-600 border-blue-600 dark:bg-blue-500 dark:border-blue-500' 
+            : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
           disabled && 'opacity-50 cursor-not-allowed'
         )}
       >
@@ -48,7 +48,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
           {label && (
             <label 
               className={clsx(
-                'text-sm font-medium text-gray-900',
+                'text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors',
                 disabled && 'opacity-50'
               )}
             >
@@ -57,7 +57,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
           )}
           {description && (
             <p className={clsx(
-              'text-sm text-gray-600',
+              'text-sm text-gray-600 dark:text-gray-300 transition-colors',
               disabled && 'opacity-50'
             )}>
               {description}

@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
+import { SpeakerWaveIcon, MusicalNoteIcon, SignalIcon } from '@heroicons/react/24/outline';
 import { useNoteDispatcher } from '../hooks';
 import type { Event, Note, NotePlayerTypeUnion } from '../model';
 import { NotePlayerType } from '../model';
-import { Button, Card, Checkbox, Switch } from '../components';
+import { Button, Card, Checkbox, Switch, Select } from '../components';
 
 export const Sequencer: React.FC = () => {
   const [selectedPlayerType, setSelectedPlayerType] = useState<NotePlayerTypeUnion>(NotePlayerType.SINE_WAVE);
   const [enableEffects, setEnableEffects] = useState(false);
   const [autoplay, setAutoplay] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { dispatchNote, availablePlayerTypes } = useNoteDispatcher();
+  const { dispatchNote } = useNoteDispatcher();
 
   const playRandomNote = () => {
     const randomNote = Math.floor(Math.random() * 128);
@@ -78,21 +79,28 @@ export const Sequencer: React.FC = () => {
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 transition-colors">Audio Engine Settings</h2>
             
             <div className="mb-6">
-              <label htmlFor="player-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
-                Audio Engine
-              </label>
-              <select 
-                id="player-select"
-                value={selectedPlayerType} 
-                onChange={(e) => setSelectedPlayerType(e.target.value as NotePlayerTypeUnion)}
-                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-              >
-                {availablePlayerTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type.replace('_', ' ').toUpperCase()}
-                  </option>
-                ))}
-              </select>
+              <Select
+                value={selectedPlayerType}
+                onChange={(value) => setSelectedPlayerType(value as NotePlayerTypeUnion)}
+                label="Audio Engine"
+                options={[
+                  { 
+                    value: NotePlayerType.SINE_WAVE, 
+                    label: 'SINE WAVE',
+                    icon: SignalIcon
+                  },
+                  { 
+                    value: NotePlayerType.SAMPLER, 
+                    label: 'SAMPLER',
+                    icon: MusicalNoteIcon
+                  },
+                  { 
+                    value: NotePlayerType.MIDI_OUTPUT, 
+                    label: 'MIDI OUTPUT',
+                    icon: SpeakerWaveIcon
+                  }
+                ]}
+              />
             </div>
 
             <div className="space-y-4">

@@ -4,9 +4,9 @@ import { Navigation } from '..';
 
 export const BaseLayout: React.FC = () => {
   return (
-    <div className="min-h-full bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="h-screen w-screen grid grid-cols-1 grid-rows-[auto_1fr] bg-gray-50 dark:bg-gray-900 transition-colors">
       <Navigation />
-      <main>
+      <main className="overflow-y-auto">
         <Outlet />
       </main>
     </div>
