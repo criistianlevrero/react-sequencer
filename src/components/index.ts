@@ -14,5 +14,6 @@ export { Select } from './form/Select';
 export type { SelectProps, SelectOption } from './form/Select';
 
 export { Navigation } from './navigation/Navigation';
-export { BaseLayout as Layout } from './layouts/BaseLayout';
+export { BaseLayout } from './layouts/BaseLayout';
+export { SequencerLayout } from './layouts/SequencerLayout';
 export { ThemeSwitch } from './navigation/ThemeSwitch';

@@ -10,15 +10,15 @@ export const ComponentsDemo: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState('option1');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors">
+    <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-7xl mx-auto py-12 px-6">
         {/* Header Section */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full mb-6 transition-colors">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full mb-6">
             <span className="text-2xl">🎛️</span>
           </div>
-          <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">Component Library</h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto transition-colors">
+          <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">Component Library</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Explore our custom UI components built with Headless UI and Tailwind CSS. 
             Each component is designed for accessibility, flexibility, and beautiful user experiences.
           </p>
@@ -29,19 +29,19 @@ export const ComponentsDemo: React.FC = () => {
           {/* Buttons Section */}
           <Card>
             <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center mr-4 transition-colors">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center mr-4">
                 <span className="text-xl">🔘</span>
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors">Buttons</h2>
-                <p className="text-gray-600 dark:text-gray-300 transition-colors">Interactive button components with multiple variants and states</p>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Buttons</h2>
+                <p className="text-gray-600 dark:text-gray-300">Interactive button components with multiple variants and states</p>
               </div>
             </div>
             
             <div className="space-y-8">
               {/* Button Variants */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 transition-colors">Variants</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Variants</h3>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="primary">Primary Button</Button>
                   <Button variant="secondary">Secondary Button</Button>
@@ -52,7 +52,7 @@ export const ComponentsDemo: React.FC = () => {
 
               {/* Button Sizes */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 transition-colors">Sizes</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Sizes</h3>
                 <div className="flex gap-4 flex-wrap items-center">
                   <Button size="sm" variant="primary">Small</Button>
                   <Button size="md" variant="primary">Medium</Button>
@@ -62,7 +62,7 @@ export const ComponentsDemo: React.FC = () => {
 
               {/* Button States */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 transition-colors">States</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">States</h3>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="primary">Normal</Button>
                   <Button variant="primary" disabled>Disabled</Button>
@@ -74,19 +74,19 @@ export const ComponentsDemo: React.FC = () => {
           {/* Checkboxes Section */}
           <Card>
             <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-xl flex items-center justify-center mr-4 transition-colors">
+              <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-xl flex items-center justify-center mr-4">
                 <span className="text-xl">✅</span>
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors">Checkboxes</h2>
-                <p className="text-gray-600 dark:text-gray-300 transition-colors">Accessible checkbox components with labels and descriptions</p>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Checkboxes</h2>
+                <p className="text-gray-600 dark:text-gray-300">Accessible checkbox components with labels and descriptions</p>
               </div>
             </div>
             
             <div className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 transition-colors">Basic Usage</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Basic Usage</h3>
                   <Checkbox
                     checked={checked}
                     onChange={setChecked}
@@ -101,7 +101,7 @@ export const ComponentsDemo: React.FC = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 transition-colors">States</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">States</h3>
                   <Checkbox
                     checked={true}
                     onChange={() => {}}
@@ -123,19 +123,19 @@ export const ComponentsDemo: React.FC = () => {
           {/* Switches Section */}
           <Card>
             <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-xl flex items-center justify-center mr-4 transition-colors">
+              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-xl flex items-center justify-center mr-4">
                 <span className="text-xl">🔄</span>
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors">Switches</h2>
-                <p className="text-gray-600 dark:text-gray-300 transition-colors">Toggle switches for binary choices and settings</p>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Switches</h2>
+                <p className="text-gray-600 dark:text-gray-300">Toggle switches for binary choices and settings</p>
               </div>
             </div>
             
             <div className="space-y-8">
               {/* Switch Sizes */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 transition-colors">Sizes</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Sizes</h3>
                 <div className="space-y-4">
                   <Switch
                     checked={enabled}
@@ -163,7 +163,7 @@ export const ComponentsDemo: React.FC = () => {
 
               {/* Switch Features */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 transition-colors">Features</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Features</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <Switch
@@ -207,19 +207,19 @@ export const ComponentsDemo: React.FC = () => {
           {/* Select Section */}
           <Card>
             <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900 rounded-xl flex items-center justify-center mr-4 transition-colors">
+              <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900 rounded-xl flex items-center justify-center mr-4">
                 <span className="text-xl">📋</span>
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors">Select Dropdown</h2>
-                <p className="text-gray-600 dark:text-gray-300 transition-colors">Custom select components with dark mode support</p>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Select Dropdown</h2>
+                <p className="text-gray-600 dark:text-gray-300">Custom select components with dark mode support</p>
               </div>
             </div>
             
             <div className="space-y-8">
               {/* Basic Select */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 transition-colors">Basic Usage</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Basic Usage</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <Select
@@ -253,7 +253,7 @@ export const ComponentsDemo: React.FC = () => {
 
               {/* Select Features */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 transition-colors">Features</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Features</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <Select
@@ -266,7 +266,7 @@ export const ComponentsDemo: React.FC = () => {
                         { value: 'midi_output', label: 'MIDI OUTPUT', icon: ComputerDesktopIcon }
                       ]}
                     />
-                    <p className="text-sm text-gray-600 dark:text-gray-400 transition-colors">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       Perfect dark mode compatibility with smooth animations
                     </p>
                   </div>
@@ -283,7 +283,7 @@ export const ComponentsDemo: React.FC = () => {
                         { value: 'favorites', label: 'Custom Themes', icon: HeartIcon }
                       ]}
                     />
-                    <p className="text-sm text-gray-600 dark:text-gray-400 transition-colors">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       Accessible keyboard navigation and screen reader support
                     </p>
                   </div>
@@ -298,18 +298,18 @@ export const ComponentsDemo: React.FC = () => {
             className="text-center"
           >
             <div className="mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/50 dark:to-purple-900/50 rounded-full mb-4 transition-colors">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/50 dark:to-purple-900/50 rounded-full mb-4">
                 <span className="text-2xl">⚡</span>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors">Interactive Demo</h2>
-              <p className="text-gray-600 dark:text-gray-300 transition-colors">See how components work together in real scenarios</p>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Interactive Demo</h2>
+              <p className="text-gray-600 dark:text-gray-300">See how components work together in real scenarios</p>
             </div>
             
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg transition-colors">
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 transition-colors">User Preferences Panel</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">User Preferences Panel</h3>
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-4">
-                  <h4 className="font-medium text-gray-700 dark:text-gray-300 transition-colors">Notification Settings</h4>
+                  <h4 className="font-medium text-gray-700 dark:text-gray-300">Notification Settings</h4>
                   <Switch
                     checked={notifications}
                     onChange={setNotifications}
@@ -326,7 +326,7 @@ export const ComponentsDemo: React.FC = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <h4 className="font-medium text-gray-700 dark:text-gray-300 transition-colors">Actions</h4>
+                  <h4 className="font-medium text-gray-700 dark:text-gray-300">Actions</h4>
                   <div className="space-y-3">
                     <Button 
                       variant="primary" 
@@ -337,7 +337,7 @@ export const ComponentsDemo: React.FC = () => {
                     <Button variant="outline">Cancel</Button>
                   </div>
                   {(!notifications && !checked) && (
-                    <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg transition-colors">
+                    <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg">
                       ⚠️ Please enable at least one notification option to save your preferences.
                     </p>
                   )}

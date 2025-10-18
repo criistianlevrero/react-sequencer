@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SpeakerWaveIcon, MusicalNoteIcon, SignalIcon } from '@heroicons/react/24/outline';
 import { useNoteDispatcher } from '../hooks';
+import { usePlayhead } from '../contexts';
 import type { Event, Note, NotePlayerTypeUnion } from '../model';
 import { NotePlayerType } from '../model';
 import { Button, Card, Checkbox, Switch, Select } from '../components';
@@ -11,6 +12,9 @@ export const Sequencer: React.FC = () => {
   const [autoplay, setAutoplay] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const { dispatchNote } = useNoteDispatcher();
+  
+  // Playhead context
+  const playhead = usePlayhead();
 
   const playRandomNote = () => {
     const randomNote = Math.floor(Math.random() * 128);
@@ -63,20 +67,20 @@ export const Sequencer: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="">
       <div className="max-w-4xl mx-auto py-12 px-6">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Music Sequencer
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 transition-colors">
+          <p className="text-lg text-gray-600 dark:text-gray-300">
             Create and play musical sequences with our web-based sequencer
           </p>
         </div>
 
         <Card>
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 transition-colors">Audio Engine Settings</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Audio Engine Settings</h2>
             
             <div className="mb-6">
               <Select
@@ -121,8 +125,8 @@ export const Sequencer: React.FC = () => {
             </div>
           </div>
 
-          <div className="border-t dark:border-gray-700 pt-8 transition-colors">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 transition-colors">Controls</h3>
+          <div className="border-t dark:border-gray-700 pt-8">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Controls</h3>
             
             <div className="flex flex-wrap gap-4">
               <Button 
@@ -151,9 +155,78 @@ export const Sequencer: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors">
-            <h4 className="font-medium text-gray-900 dark:text-white mb-2 transition-colors">Quick Tips:</h4>
-            <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1 transition-colors">
+          {/* Playhead Controls */}
+          <div className="border-t dark:border-gray-700 pt-8 mt-8">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Playhead Control</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    BPM (Negras por minuto)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="range"
+                      min="60"
+                      max="200"
+                      value={playhead.bpm}
+                      onChange={(e) => playhead.setBpm(Number(e.target.value))}
+                      className="flex-1"
+                    />
+                    <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded min-w-[60px] text-center">
+                      {playhead.bpm}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button 
+                    variant={playhead.isPlaying && !playhead.isPaused ? "secondary" : "primary"}
+                    onClick={playhead.play}
+                    disabled={playhead.isPlaying && !playhead.isPaused}
+                  >
+                    ▶️ Play
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    onClick={playhead.pause}
+                    disabled={!playhead.isPlaying || playhead.isPaused}
+                  >
+                    ⏸️ Pause
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    onClick={playhead.stop}
+                    disabled={!playhead.isPlaying && !playhead.isPaused}
+                  >
+                    ⏹️ Stop
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Status:</h4>
+                <div className="space-y-1 text-sm font-mono">
+                  <div>Estado: {playhead.isPlaying ? (playhead.isPaused ? 'Pausado' : 'Reproduciendo') : 'Detenido'}</div>
+                  <div>BPM: {playhead.bpm}</div>
+                  <div>Pulsos: {playhead.pulseCount.toLocaleString()}</div>
+                  <div>Negras: {Math.floor(playhead.pulseCount / 480)}</div>
+                  <div>Tiempo: {((playhead.pulseCount / 480) / (playhead.bpm / 60)).toFixed(2)}s</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Debug: {playhead.isPlaying ? '✅ Playing' : '❌ Stopped'} | 
+                    Pulsos/seg: {((playhead.bpm / 60) * 480).toFixed(0)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <h4 className="font-medium text-gray-900 dark:text-white mb-2">Quick Tips:</h4>
+            <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
               <li>• Use "Play Random Note" to test individual notes</li>
               <li>• "Play Sequence" demonstrates a C major chord progression</li>
               <li>• Enable effects for enhanced audio experience</li>
