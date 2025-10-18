@@ -62,20 +62,20 @@ export const Sequencer: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <div className="max-w-4xl mx-auto py-12 px-6">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
             Music Sequencer
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 dark:text-gray-300 transition-colors">
             Create and play musical sequences with our web-based sequencer
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 transition-colors">
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Audio Engine Settings</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 transition-colors">Audio Engine Settings</h2>
             
             <div className="mb-6">
               <label htmlFor="player-select" className="block text-sm font-medium text-gray-700 mb-2">

@@ -8,15 +8,15 @@ export const ComponentsDemo: React.FC = () => {
   const [notifications, setNotifications] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors">
       <div className="max-w-7xl mx-auto py-12 px-6">
         {/* Header Section */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full mb-6 transition-colors">
             <span className="text-2xl">🎛️</span>
           </div>
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">Component Library</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">Component Library</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto transition-colors">
             Explore our custom UI components built with Headless UI and Tailwind CSS. 
             Each component is designed for accessibility, flexibility, and beautiful user experiences.
           </p>
@@ -25,21 +25,21 @@ export const ComponentsDemo: React.FC = () => {
         {/* Component Sections Grid */}
         <div className="grid gap-8 lg:gap-12">
           {/* Buttons Section */}
-          <section className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700 transition-colors">
             <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center mr-4 transition-colors">
                 <span className="text-xl">🔘</span>
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-gray-900">Buttons</h2>
-                <p className="text-gray-600">Interactive button components with multiple variants and states</p>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors">Buttons</h2>
+                <p className="text-gray-600 dark:text-gray-300 transition-colors">Interactive button components with multiple variants and states</p>
               </div>
             </div>
             
             <div className="space-y-8">
               {/* Button Variants */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Variants</h3>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 transition-colors">Variants</h3>
                 <div className="flex gap-4 flex-wrap">
                   <Button variant="primary">Primary Button</Button>
                   <Button variant="secondary">Secondary Button</Button>

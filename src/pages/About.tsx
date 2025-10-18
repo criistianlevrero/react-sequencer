@@ -2,20 +2,20 @@ import React from 'react';
 
 export const About: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <div className="max-w-4xl mx-auto py-12 px-6">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
             About Music Sequencer
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-gray-600 dark:text-gray-300 transition-colors">
             Learn more about this project and its technologies
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Project Overview</h2>
-          <p className="text-gray-600 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8 transition-colors">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 transition-colors">Project Overview</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4 transition-colors">
             This Music Sequencer is a modern web application built to demonstrate advanced web technologies 
             in action. It combines audio synthesis, user interface design, and real-time interaction to 
             create an engaging musical experience.

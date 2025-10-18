@@ -8,4 +8,5 @@ export { Switch } from './Switch';
 export type { SwitchProps } from './Switch';
 
 export { Navigation } from './Navigation';
-export { Layout } from './layouts/Layout';
+export { BaseLayout as Layout } from './layouts/BaseLayout';
+export { ThemeSwitch } from './ThemeSwitch';
