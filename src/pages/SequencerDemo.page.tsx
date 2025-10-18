@@ -6,7 +6,7 @@ import type { Event, Note, NotePlayerTypeUnion } from '../model';
 import { NotePlayerType } from '../model';
 import { Button, Card, Checkbox, Switch, Select, Metronome } from '../components';
 
-export const SequencerDemo: React.FC = () => {
+export const SequencerDemoPage: React.FC = () => {
   const [selectedPlayerType, setSelectedPlayerType] = useState<NotePlayerTypeUnion>(NotePlayerType.SINE_WAVE);
   const [enableEffects, setEnableEffects] = useState(false);
   const [autoplay, setAutoplay] = useState(false);

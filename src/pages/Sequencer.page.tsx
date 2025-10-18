@@ -2,7 +2,7 @@ import React from 'react';
 import { usePlayhead } from '../contexts';
 import { Button, Card } from '../components';
 
-export const Sequencer: React.FC = () => {
+export const SequencerPage: React.FC = () => {
   const playhead = usePlayhead();
 
   return (

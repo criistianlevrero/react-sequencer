@@ -1,4 +1,4 @@
-export { Sequencer } from './Sequencer';
-export { SequencerDemo } from './SequencerDemo';
-export { ComponentsDemo } from './ComponentsDemo';
-export { About } from './About';
+export { SequencerPage } from './Sequencer.page';
+export { SequencerDemoPage } from './SequencerDemo.page';
+export { ComponentsDemoPage } from './ComponentsDemo.page';
+export { AboutPage } from './About.page';

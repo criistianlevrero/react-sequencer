@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SunIcon, MoonIcon, ComputerDesktopIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { Button, Card, Checkbox, Switch, Select } from '../components';
 
-export const ComponentsDemo: React.FC = () => {
+export const ComponentsDemoPage: React.FC = () => {
   const [checked, setChecked] = useState(false);
   const [enabled, setEnabled] = useState(true);
   const [secondChecked, setSecondChecked] = useState(true);
