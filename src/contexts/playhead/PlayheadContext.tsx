@@ -1,5 +1,5 @@
 import React, { createContext, useState, useRef, useCallback, useEffect } from 'react';
-import type { PlayheadContextType } from './usePlayhead';
+import type { PlayheadContextType } from './types';
 
 const PlayheadContext = createContext<PlayheadContextType | undefined>(undefined);
 

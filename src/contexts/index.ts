@@ -1,3 +1,2 @@
-export { PlayheadProvider, PlayheadContext } from './PlayheadContext';
-export { usePlayhead } from './usePlayhead';
-export type { PlayheadContextType } from './usePlayhead';
+export { PlayheadProvider, PlayheadContext, usePlayhead } from './playhead';
+export type { PlayheadContextType } from './playhead';

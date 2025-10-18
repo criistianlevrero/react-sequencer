@@ -1,19 +1,6 @@
 import { useContext } from 'react';
 import { PlayheadContext } from './PlayheadContext';
-
-export interface PlayheadContextType {
-  // State
-  isPlaying: boolean;
-  isPaused: boolean;
-  bpm: number; // Negras por minuto
-  pulseCount: number; // Contador de pulsos actual
-  
-  // Actions
-  play: () => void;
-  pause: () => void;
-  stop: () => void;
-  setBpm: (newBpm: number) => void;
-}
+import type { PlayheadContextType } from './types';
 
 // Hook personalizado para usar el contexto
 export const usePlayhead = (): PlayheadContextType => {
