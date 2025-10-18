@@ -93,6 +93,11 @@ export const PlayheadProvider: React.FC<PlayheadProviderProps> = ({ children }) 
     setBpmState(newBpm);
   }, []);
 
+  // Función para obtener pulsos por negra
+  const getPulsesPerQuarterNote = useCallback(() => {
+    return PULSES_PER_QUARTER_NOTE;
+  }, []);
+
   // Limpiar intervalo al desmontar el componente
   useEffect(() => {
     return () => {
@@ -109,6 +114,7 @@ export const PlayheadProvider: React.FC<PlayheadProviderProps> = ({ children }) 
     pause,
     stop,
     setBpm,
+    getPulsesPerQuarterNote,
   };
 
   return (

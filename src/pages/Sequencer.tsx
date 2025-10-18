@@ -4,7 +4,7 @@ import { useNoteDispatcher } from '../hooks';
 import { usePlayhead } from '../contexts';
 import type { Event, Note, NotePlayerTypeUnion } from '../model';
 import { NotePlayerType } from '../model';
-import { Button, Card, Checkbox, Switch, Select } from '../components';
+import { Button, Card, Checkbox, Switch, Select, Metronome } from '../components';
 
 export const Sequencer: React.FC = () => {
   const [selectedPlayerType, setSelectedPlayerType] = useState<NotePlayerTypeUnion>(NotePlayerType.SINE_WAVE);
@@ -15,6 +15,23 @@ export const Sequencer: React.FC = () => {
   
   // Playhead context
   const playhead = usePlayhead();
+
+  // Función para el tick del metrónomo
+  const handleMetronomeTick = () => {
+    const metronomeNote: Note = {
+      channel: 1,
+      note: 72, // C5 - nota aguda para el metrónomo
+      velocity: 80,
+      duration: 100 // Duración muy corta
+    };
+
+    const event: Event = {
+      event: metronomeNote,
+      playerType: NotePlayerType.SINE_WAVE // Usar onda senoidal para el metrónomo
+    };
+
+    dispatchNote(event);
+  };
 
   const playRandomNote = () => {
     const randomNote = Math.floor(Math.random() * 128);
@@ -213,14 +230,29 @@ export const Sequencer: React.FC = () => {
                   <div>Estado: {playhead.isPlaying ? (playhead.isPaused ? 'Pausado' : 'Reproduciendo') : 'Detenido'}</div>
                   <div>BPM: {playhead.bpm}</div>
                   <div>Pulsos: {playhead.pulseCount.toLocaleString()}</div>
-                  <div>Negras: {Math.floor(playhead.pulseCount / 480)}</div>
-                  <div>Tiempo: {((playhead.pulseCount / 480) / (playhead.bpm / 60)).toFixed(2)}s</div>
+                  <div>Negras: {Math.floor(playhead.pulseCount / playhead.getPulsesPerQuarterNote())}</div>
+                  <div>Progreso: {playhead.pulseCount % playhead.getPulsesPerQuarterNote()}/{playhead.getPulsesPerQuarterNote()} pulsos</div>
+                  <div>Tiempo: {((playhead.pulseCount / playhead.getPulsesPerQuarterNote()) / (playhead.bpm / 60)).toFixed(2)}s</div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                     Debug: {playhead.isPlaying ? '✅ Playing' : '❌ Stopped'} | 
-                    Pulsos/seg: {((playhead.bpm / 60) * 480).toFixed(0)}
+                    Pulsos/seg: {((playhead.bpm / 60) * playhead.getPulsesPerQuarterNote()).toFixed(0)}
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Metronome Section */}
+          <div className="border-t dark:border-gray-700 pt-8 mt-8">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Metrónomo</h3>
+            <div className="mb-4">
+              <Metronome 
+                onTick={handleMetronomeTick}
+                className="mb-4"
+              />
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                El metrónomo emite una nota corta en cada negra cuando el playhead está activo.
+              </p>
             </div>
           </div>
 

@@ -10,4 +10,7 @@ export interface PlayheadContextType {
   pause: () => void;
   stop: () => void;
   setBpm: (newBpm: number) => void;
+  
+  // Utilities
+  getPulsesPerQuarterNote: () => number;
 }

@@ -17,3 +17,5 @@ export { Navigation } from './navigation/Navigation';
 export { BaseLayout } from './layouts/BaseLayout';
 export { SequencerLayout } from './layouts/SequencerLayout';
 export { ThemeSwitch } from './navigation/ThemeSwitch';
+
+export { Metronome } from './Metronome';
