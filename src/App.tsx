@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { BaseLayout, SequencerLayout } from './components';
-import { Sequencer, ComponentsDemo, About } from './pages';
+import { Sequencer, SequencerDemo, ComponentsDemo, About } from './pages';
 
 function App() {
   return (
@@ -8,6 +8,11 @@ function App() {
       {/* Sequencer page with its own layout */}
       <Route path="/" element={<SequencerLayout />}>
         <Route index element={<Sequencer />} />
+      </Route>
+      
+      {/* Sequencer demo with its own layout */}
+      <Route path="/sequencerDemo" element={<SequencerLayout />}>
+        <Route index element={<SequencerDemo />} />
       </Route>
       
       {/* Other pages with base layout */}

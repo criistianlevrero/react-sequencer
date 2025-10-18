@@ -8,7 +8,8 @@ export const Navigation: React.FC = () => {
 
   const navItems = [
     { path: '/', label: 'Sequencer', icon: '🎵' },
-    { path: '/components', label: 'Components', icon: '🎛️' },
+    { path: '/sequencerDemo', label: 'Demo', icon: '🎛️' },
+    { path: '/components', label: 'Components', icon: '⚙️' },
     { path: '/about', label: 'About', icon: 'ℹ️' },
   ];
 
