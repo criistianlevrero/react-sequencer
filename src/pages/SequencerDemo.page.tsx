@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { SpeakerWaveIcon, MusicalNoteIcon, SignalIcon } from '@heroicons/react/24/outline';
-import { useNoteDispatcher } from '../hooks';
-import { usePlayhead } from '../contexts';
-import type { Event, Note, NotePlayerTypeUnion } from '../model';
-import { NotePlayerType } from '../model';
-import { Button, Card, Checkbox, Switch, Select, Metronome } from '../components';
+import { useNoteDispatcher } from '@hooks';
+import { usePlayhead } from '@contexts';
+import type { Event, Note, NotePlayerTypeUnion } from '@model';
+import { NotePlayerType } from '@model';
+import { Button, Card, Checkbox, Switch, Select, Metronome } from '@components';
 
 export const SequencerDemoPage: React.FC = () => {
   const [selectedPlayerType, setSelectedPlayerType] = useState<NotePlayerTypeUnion>(NotePlayerType.SINE_WAVE);

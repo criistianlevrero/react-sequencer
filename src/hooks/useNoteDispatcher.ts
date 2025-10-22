@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import type { Event } from '../model';
-import { NotePlayerType } from '../model';
+import type { Event } from '@model';
+import { NotePlayerType } from '@model';
 import { useNotePlayer } from './useNotePlayer';
 import type { INotePlayer } from './interfaces';
 

@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
-import { BaseLayout, SequencerLayout } from './components';
-import { SequencerPage, SequencerDemoPage, ComponentsDemoPage, AboutPage } from './pages';
+import { BaseLayout, SequencerLayout } from '@components';
+import { SequencerPage, SequencerDemoPage, ComponentsDemoPage, AboutPage } from '@pages';
 
 function App() {
   return (

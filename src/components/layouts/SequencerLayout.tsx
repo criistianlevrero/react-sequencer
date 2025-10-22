@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navigation } from '..';
-import { PlayheadProvider } from '../../contexts';
+import { PlayheadProvider } from '@contexts';
 
 export const SequencerLayout: React.FC = () => {
   return (

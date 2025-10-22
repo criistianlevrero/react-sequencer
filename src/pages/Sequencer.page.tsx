@@ -1,6 +1,6 @@
 import React from 'react';
-import { usePlayhead } from '../contexts';
-import { Button, Card, Sequencer } from '../components';
+import { usePlayhead } from '@contexts';
+import { Button, Card, Sequencer } from '@components';
 
 export const SequencerPage: React.FC = () => {
   const playhead = usePlayhead();

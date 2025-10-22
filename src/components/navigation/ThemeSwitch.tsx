@@ -1,7 +1,7 @@
 import React from 'react';
 import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 import { Switch } from '../form/Switch';
-import { useTheme } from '../../hooks';
+import { useTheme } from '@hooks';
 
 export const ThemeSwitch: React.FC = () => {
   const { theme, toggleTheme } = useTheme();

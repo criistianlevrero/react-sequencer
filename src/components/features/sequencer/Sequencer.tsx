@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { usePlayhead } from '../../../contexts';
-import { useNoteDispatcher } from '../../../hooks';
-import { Checkbox, Select } from '../..';
-import type { Event, Note, NotePlayerTypeUnion } from '../../../model';
-import { NotePlayerType } from '../../../model';
+import { usePlayhead } from '@contexts';
+import { useNoteDispatcher } from '@hooks';
+import { Checkbox, Select } from '@components';
+import type { Event, Note, NotePlayerTypeUnion } from '@model';
+import { NotePlayerType } from '@model';
 
 export interface SequencerProps {
   className?: string;
