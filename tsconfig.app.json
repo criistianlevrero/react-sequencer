@@ -31,7 +31,9 @@
       "@model": ["./src/model"],
       "@model/*": ["./src/model/*"],
       "@pages": ["./src/pages"],
-      "@pages/*": ["./src/pages/*"]
+      "@pages/*": ["./src/pages/*"],
+      "@utils": ["./src/utils"],
+      "@utils/*": ["./src/utils/*"]
     },
 
     /* Linting */

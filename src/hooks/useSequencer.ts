@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { usePlayhead } from '@contexts';
 import { useNotePlayer } from '@hooks';
+import { PULSES_PER_QUARTER_NOTE } from '@utils';
 import type { 
   SequencerState, 
   SequencerActions, 
@@ -29,7 +30,7 @@ export function useSequencer(initialDuration = 4): [SequencerState, SequencerAct
   const { playNote } = useNotePlayer();
 
   // Utilidades para cálculo de pulsos
-  const pulsesPerQuarterNote = useMemo(() => 480, []);
+  const pulsesPerQuarterNote = useMemo(() => PULSES_PER_QUARTER_NOTE, []);
   const totalPulses = useMemo(() => duration * pulsesPerQuarterNote, [duration, pulsesPerQuarterNote]);
   const gridPulseStep = useMemo(() => pulsesPerQuarterNote / gridResolution, [pulsesPerQuarterNote, gridResolution]);
 

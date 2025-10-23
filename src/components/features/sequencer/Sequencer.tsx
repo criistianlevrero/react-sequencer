@@ -4,6 +4,7 @@ import { usePlayhead } from '@contexts';
 import { Checkbox, Select, Button } from '@components';
 import type { NotePlayerTypeUnion } from '@model';
 import { NotePlayerType } from '@model';
+import { PULSES_PER_QUARTER_NOTE } from '@utils';
 
 export interface SequencerProps {
   className?: string;
@@ -20,8 +21,10 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
   React.useEffect(() => {
     if (!hasInitialLoad) {
       const cMajorScale = [60, 62, 64, 65, 67, 69, 71, 72]; // C4 to C5
-      const timedEvents = cMajorScale.map((note, index) => ({
-        pulse: index * 480, // Every quarter note (480 pulses)
+      const totalPulses = state.duration * PULSES_PER_QUARTER_NOTE;
+      
+      const timedEvents = cMajorScale.map((note) => ({
+        pulse: Math.floor(Math.random() * totalPulses), // Posición aleatoria dentro de la duración
         event: {
           note,
           velocity: 80,
@@ -34,7 +37,7 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
       actions.loadSequence(timedEvents);
       setHasInitialLoad(true);
     }
-  }, [hasInitialLoad, selectedPlayerType, actions]);
+  }, [hasInitialLoad, selectedPlayerType, actions, state.duration]);
 
   const playerTypeOptions = [
     { 
@@ -71,7 +74,7 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
 
   // Calcular posiciones de grilla y eventos para la representación gráfica
   const visualData = useMemo(() => {
-    const totalPulses = state.duration * 480; // 480 pulses per quarter note
+    const totalPulses = state.duration * PULSES_PER_QUARTER_NOTE;
     const gridSteps = state.duration * (state.gridResolution / 4); // Total grid steps
     
     // Crear array de posiciones de grilla (líneas verticales)
@@ -223,8 +226,10 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
                 variant="outline"
                 onClick={() => {
                   const cMajorScale = [60, 62, 64, 65, 67, 69, 71, 72];
-                  const timedEvents = cMajorScale.map((note, index) => ({
-                    pulse: index * 480,
+                  const totalPulses = state.duration * PULSES_PER_QUARTER_NOTE;
+                  
+                  const timedEvents = cMajorScale.map((note) => ({
+                    pulse: Math.floor(Math.random() * totalPulses), // Posición aleatoria dentro de la duración
                     event: {
                       note,
                       velocity: 80,

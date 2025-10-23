@@ -1,5 +1,6 @@
 import React, { createContext, useState, useRef, useCallback, useEffect } from 'react';
 import type { PlayheadContextType } from './types';
+import { PULSES_PER_QUARTER_NOTE } from '@utils';
 
 const PlayheadContext = createContext<PlayheadContextType | undefined>(undefined);
 
@@ -18,9 +19,6 @@ export const PlayheadProvider: React.FC<PlayheadProviderProps> = ({ children }) 
   const startTimeRef = useRef<number | null>(null);
   const pausedDurationRef = useRef<number>(0); // Tiempo total pausado acumulado
   const pauseStartTimeRef = useRef<number | null>(null);
-
-  // Constantes
-  const PULSES_PER_QUARTER_NOTE = 480; // 480 pulsos por negra
 
   // Función para limpiar el intervalo
   const clearTimer = useCallback(() => {
