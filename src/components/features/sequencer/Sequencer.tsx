@@ -76,12 +76,32 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
       });
     });
 
-    // Calcular posición del playhead
+    // Calcular posición del playhead según el modo de playback
     const sequencePulse = pulseCount % totalPulses;
-    const playheadPosition = (sequencePulse / totalPulses) * 100;
+    let visualPulse = sequencePulse;
+    
+    switch (state.playbackType) {
+      case 'backwards':
+        visualPulse = totalPulses - 1 - sequencePulse;
+        break;
+      case 'pingpong': {
+        const cycleNumber = Math.floor(pulseCount / totalPulses);
+        const isForwardCycle = cycleNumber % 2 === 0;
+        if (!isForwardCycle) {
+          visualPulse = totalPulses - 1 - sequencePulse;
+        }
+        break;
+      }
+      case 'forward':
+      default:
+        visualPulse = sequencePulse;
+        break;
+    }
+    
+    const playheadPosition = (visualPulse / totalPulses) * 100;
     
     return { gridLines, eventPositions, playheadPosition };
-  }, [state.events, state.duration, state.gridResolution, pulseCount]);
+  }, [state.events, state.duration, state.gridResolution, state.playbackType, pulseCount]);
 
   return (
     <div className={`border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 ${className}`}>
