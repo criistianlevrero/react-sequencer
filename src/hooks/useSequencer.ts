@@ -18,12 +18,11 @@ export function useSequencer(initialDuration = 4): [SequencerState, SequencerAct
   const [playbackType, setPlaybackTypeState] = useState<PlaybackType>('forward');
   const [gridResolution, setGridResolutionState] = useState<GridResolution>(16);
   const [isSnapToGrid, setSnapToGridState] = useState(true);
-  const [isActive, setActiveState] = useState(false);
+  const [isActive, setActiveState] = useState(true);
 
   // Referencias para control interno
   const lastPlayedEventRef = useRef<number>(-1);
   const playbackCycleRef = useRef<number>(0);
-  const randomPoolRef = useRef<number[]>([]);
 
   // Hooks de contexto
   const { pulseCount, isPlaying } = usePlayhead();
@@ -32,13 +31,6 @@ export function useSequencer(initialDuration = 4): [SequencerState, SequencerAct
   // Utilidades para cálculo de pulsos
   const pulsesPerQuarterNote = useMemo(() => PULSES_PER_QUARTER_NOTE, []);
   const totalPulses = useMemo(() => duration * pulsesPerQuarterNote, [duration, pulsesPerQuarterNote]);
-  const gridPulseStep = useMemo(() => pulsesPerQuarterNote / gridResolution, [pulsesPerQuarterNote, gridResolution]);
-
-  // Función para snap to grid
-  const snapToGrid = useCallback((pulse: number): number => {
-    if (!isSnapToGrid) return pulse;
-    return Math.round(pulse / gridPulseStep) * gridPulseStep;
-  }, [isSnapToGrid, gridPulseStep]);
 
   // Obtener eventos activos ordenados
   const activeEvents = useMemo(() => {
@@ -86,27 +78,6 @@ export function useSequencer(initialDuration = 4): [SequencerState, SequencerAct
     }
   }, [activeEvents, totalPulses, getForwardEvent, getBackwardsEvent]);
 
-  // Algoritmo de playback random
-  const getRandomEvent = useCallback((currentPulse: number): TimedEvent | null => {
-    if (activeEvents.length === 0) return null;
-    
-    const sequencePulse = currentPulse % totalPulses;
-    
-    // Resetear pool si está vacío o cambió el ciclo
-    if (randomPoolRef.current.length === 0 || sequencePulse === 0) {
-      randomPoolRef.current = [...Array(activeEvents.length).keys()];
-    }
-    
-    // Solo reproducir en el primer pulse del ciclo para simplicidad
-    if (sequencePulse === 0 && randomPoolRef.current.length > 0) {
-      const randomIndex = Math.floor(Math.random() * randomPoolRef.current.length);
-      const eventIndex = randomPoolRef.current.splice(randomIndex, 1)[0];
-      return activeEvents[eventIndex];
-    }
-    
-    return null;
-  }, [activeEvents, totalPulses]);
-
   // Selector de algoritmo según playback type
   const getCurrentEvent = useCallback((currentPulse: number): TimedEvent | null => {
     switch (playbackType) {
@@ -116,12 +87,10 @@ export function useSequencer(initialDuration = 4): [SequencerState, SequencerAct
         return getBackwardsEvent(currentPulse);
       case 'pingpong':
         return getPingPongEvent(currentPulse);
-      case 'random':
-        return getRandomEvent(currentPulse);
       default:
         return getForwardEvent(currentPulse);
     }
-  }, [playbackType, getForwardEvent, getBackwardsEvent, getPingPongEvent, getRandomEvent]);
+  }, [playbackType, getForwardEvent, getBackwardsEvent, getPingPongEvent]);
 
   // Efecto para reproducción de eventos
   useEffect(() => {
@@ -145,20 +114,18 @@ export function useSequencer(initialDuration = 4): [SequencerState, SequencerAct
 
   // Acciones del hook
   const setEvent = useCallback((pulse: number, event: SequencerEvent) => {
-    const snappedPulse = snapToGrid(pulse);
     setEvents(prev => {
       const newEvents = new Map(prev);
-      const existingEvents = newEvents.get(snappedPulse) || [];
-      newEvents.set(snappedPulse, [...existingEvents, event]);
+      const existingEvents = newEvents.get(pulse) || [];
+      newEvents.set(pulse, [...existingEvents, event]);
       return newEvents;
     });
-  }, [snapToGrid]);
+  }, []);
 
   const removeEvent = useCallback((pulse: number, eventIndex?: number) => {
-    const snappedPulse = snapToGrid(pulse);
     setEvents(prev => {
       const newEvents = new Map(prev);
-      const existingEvents = newEvents.get(snappedPulse);
+      const existingEvents = newEvents.get(pulse);
       
       if (!existingEvents) return newEvents;
       
@@ -166,18 +133,18 @@ export function useSequencer(initialDuration = 4): [SequencerState, SequencerAct
         // Remover evento específico por índice
         const filteredEvents = existingEvents.filter((_, i) => i !== eventIndex);
         if (filteredEvents.length === 0) {
-          newEvents.delete(snappedPulse);
+          newEvents.delete(pulse);
         } else {
-          newEvents.set(snappedPulse, filteredEvents);
+          newEvents.set(pulse, filteredEvents);
         }
       } else {
         // Remover todos los eventos en ese pulse
-        newEvents.delete(snappedPulse);
+        newEvents.delete(pulse);
       }
       
       return newEvents;
     });
-  }, [snapToGrid]);
+  }, []);
 
   const clearEvents = useCallback(() => {
     setEvents(new Map());
@@ -192,7 +159,6 @@ export function useSequencer(initialDuration = 4): [SequencerState, SequencerAct
     // Resetear referencias de control cuando cambia el modo
     lastPlayedEventRef.current = -1;
     playbackCycleRef.current = 0;
-    randomPoolRef.current = [];
   }, []);
 
   const setGridResolution = useCallback((resolution: GridResolution) => {
@@ -214,13 +180,12 @@ export function useSequencer(initialDuration = 4): [SequencerState, SequencerAct
     const newEvents = new Map<number, SequencerEvent[]>();
     
     timedEvents.forEach(({ pulse, event }) => {
-      const snappedPulse = snapToGrid(pulse);
-      const existingEvents = newEvents.get(snappedPulse) || [];
-      newEvents.set(snappedPulse, [...existingEvents, event]);
+      const existingEvents = newEvents.get(pulse) || [];
+      newEvents.set(pulse, [...existingEvents, event]);
     });
     
     setEvents(newEvents);
-  }, [snapToGrid]);
+  }, []);
 
   // Estado y acciones
   const state: SequencerState = {

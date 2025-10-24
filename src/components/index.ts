@@ -21,5 +21,11 @@ export { ThemeSwitch } from './navigation/ThemeSwitch';
 export { Metronome } from './features/metronome';
 export type { MetronomeProps } from './features/metronome';
 
+export { PlayheadControls } from './features/playhead';
+export type { PlayheadControlsProps } from './features/playhead';
+
 export { Sequencer } from './features/sequencer';
 export type { SequencerProps } from './features/sequencer';
+
+export { SequenceDisplay } from './features/sequencer/SequenceDisplay';
+export type { SequenceDisplayProps, VisualData } from './features/sequencer/SequenceDisplay';

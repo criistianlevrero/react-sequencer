@@ -14,8 +14,7 @@ export interface TimedEvent {
 export const PlaybackType = {
   FORWARD: 'forward',
   BACKWARDS: 'backwards',
-  PINGPONG: 'pingpong',
-  RANDOM: 'random'
+  PINGPONG: 'pingpong'
 } as const;
 
 export type PlaybackType = typeof PlaybackType[keyof typeof PlaybackType];

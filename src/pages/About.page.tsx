@@ -69,8 +69,8 @@ export const AboutPage: React.FC = () => {
               <ul className="space-y-1 text-gray-600 dark:text-gray-300 text-sm">
                 <li>• Note scheduling</li>
                 <li>• Sequence playback</li>
-                <li>• Random note generation</li>
                 <li>• Pattern creation</li>
+                <li>• Multiple playback modes</li>
               </ul>
             </div>
             <div>

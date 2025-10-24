@@ -2,9 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { useSequencer, type PlaybackType, type GridResolution } from '@hooks';
 import { usePlayhead } from '@contexts';
 import { Checkbox, Select, Button } from '@components';
+import { SequenceDisplay } from './SequenceDisplay';
 import type { NotePlayerTypeUnion } from '@model';
 import { NotePlayerType } from '@model';
-import { PULSES_PER_QUARTER_NOTE } from '@utils';
+import { PULSES_PER_QUARTER_NOTE, playerTypeOptions, playbackTypeOptions, gridResolutionOptions } from '@utils';
 
 export interface SequencerProps {
   className?: string;
@@ -38,35 +39,6 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
       setHasInitialLoad(true);
     }
   }, [hasInitialLoad, selectedPlayerType, actions, state.duration]);
-
-  const playerTypeOptions = [
-    { 
-      value: NotePlayerType.SINE_WAVE, 
-      label: 'Sine Wave'
-    },
-    { 
-      value: NotePlayerType.SAMPLER, 
-      label: 'Sampler'
-    },
-    { 
-      value: NotePlayerType.MIDI_OUTPUT, 
-      label: 'MIDI Output'
-    }
-  ];
-
-  const playbackTypeOptions = [
-    { value: 'forward', label: 'Forward' },
-    { value: 'backwards', label: 'Backwards' },
-    { value: 'pingpong', label: 'Ping Pong' },
-    { value: 'random', label: 'Random' }
-  ];
-
-  const gridResolutionOptions = [
-    { value: '4', label: '1/4 - Quarter Notes' },
-    { value: '8', label: '1/8 - Eighth Notes' },
-    { value: '16', label: '1/16 - Sixteenth Notes' },
-    { value: '32', label: '1/32 - Thirty-second Notes' }
-  ];
 
   const activeEventsCount = useMemo(() => {
     return Array.from(state.events.values()).reduce((total, events) => total + events.length, 0);
@@ -250,61 +222,14 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
       )}
 
       {/* Zona Inferior: Representación Gráfica */}
-      <div className="p-4">
-        <div className="relative w-full h-16 bg-gray-100 dark:bg-gray-800 rounded border">
-          {/* Línea horizontal principal */}
-          <div className="absolute top-1/2 left-2 right-2 h-0.5 bg-gray-400 dark:bg-gray-600 transform -translate-y-1/2"></div>
-          
-          {/* Líneas verticales de grilla */}
-          {visualData.gridLines.map((gridLine, index) => (
-            <div
-              key={index}
-              className="absolute top-2 bottom-2 w-0.5 bg-gray-300 dark:bg-gray-700 z-5"
-              style={{ left: `${gridLine.position}%` }}
-            ></div>
-          ))}
-          
-          {/* Rombos representando eventos */}
-          {visualData.eventPositions.map((event, index) => (
-            <div
-              key={index}
-              className="absolute top-1/2 w-3 h-3 bg-blue-500 transform -translate-x-1/2 -translate-y-1/2 rotate-45 z-20"
-              style={{ left: `${event.position}%` }}
-              title={`Note: ${event.note}, Velocity: ${event.velocity}, Pulse: ${event.pulse}`}
-            ></div>
-          ))}
-          
-          {/* Marcadores de beats (negras) */}
-          {Array.from({ length: state.duration + 1 }, (_, i) => (
-            <div
-              key={i}
-              className="absolute top-0 bottom-0 w-0.5 bg-gray-600 dark:bg-gray-400 z-10"
-              style={{ left: `${(i / state.duration) * 100}%` }}
-            ></div>
-          ))}
-          
-          {/* Línea del playhead */}
-          {isPlaying && (
-            <div
-              className="absolute top-0 bottom-0 w-0.5 bg-red-500 dark:bg-red-400 z-15 transition-all duration-75"
-              style={{ left: `${visualData.playheadPosition}%` }}
-              title={`Playhead: ${pulseCount} pulses`}
-            ></div>
-          )}
-        </div>
-        
-        {/* Info de la representación */}
-        <div className="mt-2 flex justify-between text-xs text-gray-500 dark:text-gray-400">
-          <span>Duration: {state.duration} beats</span>
-          <span>Grid: 1/{state.gridResolution}</span>
-          <span>Mode: {state.playbackType}</span>
-          {isPlaying && (
-            <span className="text-red-500 dark:text-red-400">
-              ▶ Pulse: {pulseCount}
-            </span>
-          )}
-        </div>
-      </div>
+      <SequenceDisplay
+        visualData={visualData}
+        duration={state.duration}
+        gridResolution={state.gridResolution}
+        playbackType={state.playbackType}
+        pulseCount={pulseCount}
+        isPlaying={isPlaying}
+      />
     </div>
   );
 };
