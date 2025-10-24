@@ -20,6 +20,7 @@ export interface SequenceDisplayProps {
   playbackType: PlaybackType;
   pulseCount: number;
   isPlaying: boolean;
+  isSnapToGrid: boolean;
   onEventClick?: (eventData: { pulse: number; note: number; velocity: number }) => void;
   onEventDrop?: (eventData: { 
     originalPulse: number; 
@@ -53,6 +54,7 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
   playbackType,
   pulseCount,
   isPlaying,
+  isSnapToGrid,
   onEventClick,
   onEventDrop,
   className = ''
@@ -87,6 +89,13 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
     const totalPulses = duration * PULSES_PER_QUARTER_NOTE;
     const exactPulse = (percentage / 100) * totalPulses;
     
+    // Si snap to grid está desactivado, redondear al pulso entero más cercano
+    if (!isSnapToGrid) {
+      const roundedPulse = Math.round(exactPulse);
+      return Math.max(0, Math.min(totalPulses - 1, roundedPulse));
+    }
+    
+    // Si snap to grid está activado, aplicar snapping
     // Calcular el step size para snap to grid
     const quarterNotesPerStep = 4 / gridResolution; // ej: para 1/16, step = 4/16 = 0.25 quarter notes
     const pulsesPerStep = quarterNotesPerStep * PULSES_PER_QUARTER_NOTE;
@@ -94,9 +103,9 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
     // Snap al grid más cercano
     const snappedPulse = Math.round(exactPulse / pulsesPerStep) * pulsesPerStep;
     
-    // Asegurar que esté dentro de los límites
-    return Math.max(0, Math.min(totalPulses - 1, snappedPulse));
-  }, [duration, gridResolution]);
+    // Asegurar que esté dentro de los límites y que sea entero
+    return Math.max(0, Math.min(totalPulses - 1, Math.round(snappedPulse)));
+  }, [duration, gridResolution, isSnapToGrid]);
 
   // Convertir pulso de vuelta a porcentaje (para mostrar nota fantasma)
   const pulseToPercentage = useCallback((pulse: number) => {
@@ -188,18 +197,19 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
     // Si ya estamos en modo drag, reportar el movimiento
     if (mouseState.isDragging) {
       const { percentage } = getRelativePosition(event);
-      const snappedPulse = percentageToPulse(percentage);
-      const snappedPosition = pulseToPercentage(snappedPulse);
+      const targetPulse = percentageToPulse(percentage);
+      const targetPosition = pulseToPercentage(targetPulse);
       
       console.log('🔄 Dragging:', {
         currentPosition: { x, y },
         percentage: percentage.toFixed(2),
-        snappedPulse,
-        snappedPosition: snappedPosition.toFixed(2),
+        targetPulse,
+        targetPosition: targetPosition.toFixed(2),
+        isSnapToGrid,
         deltaFromStart: { deltaX, deltaY }
       });
     }
-  }, [mouseState, getRelativePosition, getEventAtPosition, percentageToPulse, pulseToPercentage]);
+  }, [mouseState, getRelativePosition, getEventAtPosition, percentageToPulse, pulseToPercentage, isSnapToGrid]);
 
   const handleMouseUp = useCallback((event: React.MouseEvent) => {
     const { x, y, percentage } = getRelativePosition(event);
@@ -215,10 +225,11 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
         note: mouseState.draggedEvent.note,
         velocity: mouseState.draggedEvent.velocity,
         gridResolution,
+        isSnapToGrid,
         startPosition: { x: mouseState.startX, y: mouseState.startY },
         endPosition: { x, y },
         endPercentage: percentage.toFixed(2),
-        snappedPercentage: pulseToPercentage(newPulse).toFixed(2)
+        finalPosition: pulseToPercentage(newPulse).toFixed(2)
       });
 
       // Solo llamar al callback si la posición cambió
@@ -265,7 +276,7 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
       currentY: 0,
       draggedEvent: null
     }));
-  }, [mouseState, getRelativePosition, percentageToPulse, onEventDrop, gridResolution, pulseToPercentage, getEventAtPosition, onEventClick]);
+  }, [mouseState, getRelativePosition, percentageToPulse, onEventDrop, gridResolution, isSnapToGrid, pulseToPercentage, getEventAtPosition, onEventClick]);
 
   // Prevenir el comportamiento por defecto del drag para evitar interferencias
   const handleDragStart = useCallback((event: React.DragEvent) => {
@@ -321,27 +332,33 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
         {/* Nota fantasma durante drag */}
         {mouseState.isDragging && mouseState.draggedEvent && (
           (() => {
-            // Calcular posición con snap to grid
+            // Calcular posición con o sin snap to grid
             const rect = containerRef.current?.getBoundingClientRect();
             if (!rect) return null;
             
             const percentage = Math.max(0, Math.min(100, (mouseState.currentX / rect.width) * 100));
-            const snappedPulse = percentageToPulse(percentage);
-            const snappedPosition = pulseToPercentage(snappedPulse);
+            const targetPulse = percentageToPulse(percentage);
+            const targetPosition = pulseToPercentage(targetPulse);
             
             return (
               <>
-                {/* Línea guía vertical */}
-                <div
-                  className="absolute top-0 bottom-0 w-0.5 bg-yellow-400 z-25 pointer-events-none opacity-60"
-                  style={{ left: `${snappedPosition}%` }}
-                ></div>
+                {/* Línea guía vertical - solo si snap to grid está activado */}
+                {isSnapToGrid && (
+                  <div
+                    className="absolute top-0 bottom-0 w-0.5 bg-yellow-400 z-25 pointer-events-none opacity-60"
+                    style={{ left: `${targetPosition}%` }}
+                  ></div>
+                )}
                 
                 {/* Nota fantasma */}
                 <div
-                  className="absolute top-1/2 w-3 h-3 bg-yellow-500 transform -translate-x-1/2 -translate-y-1/2 rotate-45 z-30 pointer-events-none opacity-80 shadow-lg border border-yellow-600"
-                  style={{ left: `${snappedPosition}%` }}
-                  title="Ghost note (drag preview)"
+                  className={`absolute top-1/2 w-3 h-3 transform -translate-x-1/2 -translate-y-1/2 rotate-45 z-30 pointer-events-none opacity-80 shadow-lg border ${
+                    isSnapToGrid 
+                      ? 'bg-yellow-500 border-yellow-600' 
+                      : 'bg-orange-500 border-orange-600'
+                  }`}
+                  style={{ left: `${targetPosition}%` }}
+                  title={isSnapToGrid ? "Ghost note (snapped to grid)" : "Ghost note (free position)"}
                 ></div>
               </>
             );

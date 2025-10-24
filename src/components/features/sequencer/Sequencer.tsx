@@ -329,6 +329,7 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
         playbackType={state.playbackType}
         pulseCount={pulseCount}
         isPlaying={isPlaying}
+        isSnapToGrid={state.isSnapToGrid}
         onEventClick={handleEventClick}
         onEventDrop={handleEventDrop}
       />
