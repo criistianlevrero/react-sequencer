@@ -29,3 +29,9 @@ export type { SequencerProps } from './features/sequencer';
 
 export { SequenceDisplay } from './features/sequencer/SequenceDisplay';
 export type { SequenceDisplayProps, VisualData } from './features/sequencer/SequenceDisplay';
+
+export { SequenceConfig } from './features/sequencer/SequenceConfig';
+export type { SequenceConfigProps } from './features/sequencer/SequenceConfig';
+
+export { NoteConfig } from './features/sequencer/NoteConfig';
+export type { NoteConfigProps, SelectedEvent } from './features/sequencer/NoteConfig';

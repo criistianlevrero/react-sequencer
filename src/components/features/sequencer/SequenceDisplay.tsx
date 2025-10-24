@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import type { PlaybackType, GridResolution } from '@hooks';
+import { PULSES_PER_QUARTER_NOTE } from '@utils';
 
 export interface VisualData {
   gridLines: Array<{ pulse: number; position: number }>;
@@ -19,6 +20,13 @@ export interface SequenceDisplayProps {
   playbackType: PlaybackType;
   pulseCount: number;
   isPlaying: boolean;
+  onEventClick?: (eventData: { pulse: number; note: number; velocity: number }) => void;
+  onEventDrop?: (eventData: { 
+    originalPulse: number; 
+    newPulse: number; 
+    note: number; 
+    velocity: number; 
+  }) => void;
   className?: string;
 }
 
@@ -27,7 +35,15 @@ interface MouseState {
   isDragging: boolean;
   startX: number;
   startY: number;
+  currentX: number;
+  currentY: number;
   dragThreshold: number;
+  startTime: number;
+  draggedEvent: {
+    pulse: number;
+    note: number;
+    velocity: number;
+  } | null;
 }
 
 export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
@@ -37,6 +53,8 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
   playbackType,
   pulseCount,
   isPlaying,
+  onEventClick,
+  onEventDrop,
   className = ''
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,7 +63,11 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
     isDragging: false,
     startX: 0,
     startY: 0,
-    dragThreshold: 5 // pixels
+    currentX: 0,
+    currentY: 0,
+    dragThreshold: 5, // pixels
+    startTime: 0,
+    draggedEvent: null
   });
 
   // Obtener posición relativa del mouse dentro del contenedor
@@ -59,6 +81,28 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
     
     return { x, y, percentage };
   }, []);
+
+  // Convertir porcentaje a pulso respetando grid snapping
+  const percentageToPulse = useCallback((percentage: number) => {
+    const totalPulses = duration * PULSES_PER_QUARTER_NOTE;
+    const exactPulse = (percentage / 100) * totalPulses;
+    
+    // Calcular el step size para snap to grid
+    const quarterNotesPerStep = 4 / gridResolution; // ej: para 1/16, step = 4/16 = 0.25 quarter notes
+    const pulsesPerStep = quarterNotesPerStep * PULSES_PER_QUARTER_NOTE;
+    
+    // Snap al grid más cercano
+    const snappedPulse = Math.round(exactPulse / pulsesPerStep) * pulsesPerStep;
+    
+    // Asegurar que esté dentro de los límites
+    return Math.max(0, Math.min(totalPulses - 1, snappedPulse));
+  }, [duration, gridResolution]);
+
+  // Convertir pulso de vuelta a porcentaje (para mostrar nota fantasma)
+  const pulseToPercentage = useCallback((pulse: number) => {
+    const totalPulses = duration * PULSES_PER_QUARTER_NOTE;
+    return (pulse / totalPulses) * 100;
+  }, [duration]);
 
   // Detectar si el mouse está sobre una nota
   const getEventAtPosition = useCallback((x: number) => {
@@ -85,7 +129,15 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
       isDown: true,
       isDragging: false,
       startX: x,
-      startY: y
+      startY: y,
+      currentX: x,
+      currentY: y,
+      startTime: Date.now(),
+      draggedEvent: eventAtPosition ? {
+        pulse: eventAtPosition.pulse,
+        note: eventAtPosition.note,
+        velocity: eventAtPosition.velocity
+      } : null
     }));
 
     if (eventAtPosition) {
@@ -96,6 +148,8 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
         position: eventAtPosition.position,
         coordinates: { x, y }
       });
+      
+      // NO llamar onEventClick aquí, lo movemos a handleMouseUp
     } else {
       console.log('📍 Empty space clicked:', {
         percentage: percentage.toFixed(2),
@@ -111,6 +165,9 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
     const deltaX = Math.abs(x - mouseState.startX);
     const deltaY = Math.abs(y - mouseState.startY);
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+    // Actualizar posición actual siempre
+    setMouseState(prev => ({ ...prev, currentX: x, currentY: y }));
 
     // Si el mouse se ha movido más allá del threshold, iniciar drag
     if (!mouseState.isDragging && distance > mouseState.dragThreshold) {
@@ -131,39 +188,84 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
     // Si ya estamos en modo drag, reportar el movimiento
     if (mouseState.isDragging) {
       const { percentage } = getRelativePosition(event);
+      const snappedPulse = percentageToPulse(percentage);
+      const snappedPosition = pulseToPercentage(snappedPulse);
+      
       console.log('🔄 Dragging:', {
         currentPosition: { x, y },
         percentage: percentage.toFixed(2),
+        snappedPulse,
+        snappedPosition: snappedPosition.toFixed(2),
         deltaFromStart: { deltaX, deltaY }
       });
     }
-  }, [mouseState, getRelativePosition, getEventAtPosition]);
+  }, [mouseState, getRelativePosition, getEventAtPosition, percentageToPulse, pulseToPercentage]);
 
   const handleMouseUp = useCallback((event: React.MouseEvent) => {
-    const { x, y } = getRelativePosition(event);
+    const { x, y, percentage } = getRelativePosition(event);
 
-    if (mouseState.isDragging) {
-      const eventAtStart = getEventAtPosition(mouseState.startX);
-      const { percentage } = getRelativePosition(event);
+    // Si se hizo drag and drop, procesar el drop
+    if (mouseState.isDragging && mouseState.draggedEvent && onEventDrop) {
+      // Calcular nueva posición en pulsos
+      const newPulse = percentageToPulse(percentage);
       
-      console.log('✅ Drag completed:', {
+      console.log('✅ Drag completed - Moving note:', {
+        originalPulse: mouseState.draggedEvent.pulse,
+        newPulse,
+        note: mouseState.draggedEvent.note,
+        velocity: mouseState.draggedEvent.velocity,
+        gridResolution,
         startPosition: { x: mouseState.startX, y: mouseState.startY },
         endPosition: { x, y },
         endPercentage: percentage.toFixed(2),
-        draggedNote: eventAtStart ? {
-          note: eventAtStart.note,
-          velocity: eventAtStart.velocity,
-          pulse: eventAtStart.pulse
-        } : null
+        snappedPercentage: pulseToPercentage(newPulse).toFixed(2)
       });
+
+      // Solo llamar al callback si la posición cambió
+      if (newPulse !== mouseState.draggedEvent.pulse) {
+        onEventDrop({
+          originalPulse: mouseState.draggedEvent.pulse,
+          newPulse,
+          note: mouseState.draggedEvent.note,
+          velocity: mouseState.draggedEvent.velocity
+        });
+      }
+    } 
+    // Si NO se hizo drag, procesar como click simple
+    else if (mouseState.isDown && !mouseState.isDragging) {
+      const clickDuration = Date.now() - mouseState.startTime;
+      const isValidClick = clickDuration < 500; // Máximo 500ms para ser considerado click
+      
+      // Buscar evento en la posición de inicio (no en la posición final)
+      const eventAtStartPosition = getEventAtPosition(mouseState.startX);
+      
+      if (eventAtStartPosition && onEventClick && isValidClick) {
+        console.log('🖱️ Note click released (no drag):', {
+          note: eventAtStartPosition.note,
+          velocity: eventAtStartPosition.velocity,
+          pulse: eventAtStartPosition.pulse,
+          clickDuration: `${clickDuration}ms`
+        });
+        
+        onEventClick({
+          pulse: eventAtStartPosition.pulse,
+          note: eventAtStartPosition.note,
+          velocity: eventAtStartPosition.velocity
+        });
+      } else if (!isValidClick) {
+        console.log('⏱️ Click too long, ignoring:', { clickDuration: `${clickDuration}ms` });
+      }
     }
 
     setMouseState(prev => ({
       ...prev,
       isDown: false,
-      isDragging: false
+      isDragging: false,
+      currentX: 0,
+      currentY: 0,
+      draggedEvent: null
     }));
-  }, [mouseState, getRelativePosition, getEventAtPosition]);
+  }, [mouseState, getRelativePosition, percentageToPulse, onEventDrop, gridResolution, pulseToPercentage, getEventAtPosition, onEventClick]);
 
   // Prevenir el comportamiento por defecto del drag para evitar interferencias
   const handleDragStart = useCallback((event: React.DragEvent) => {
@@ -194,14 +296,57 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
         ))}
         
         {/* Rombos representando eventos */}
-        {visualData.eventPositions.map((event, index) => (
-          <div
-            key={index}
-            className="absolute top-1/2 w-3 h-3 bg-blue-500 hover:bg-blue-600 transform -translate-x-1/2 -translate-y-1/2 rotate-45 z-20 cursor-pointer transition-colors"
-            style={{ left: `${event.position}%` }}
-            title={`Note: ${event.note}, Velocity: ${event.velocity}, Pulse: ${event.pulse}`}
-          ></div>
-        ))}
+        {visualData.eventPositions.map((event, index) => {
+          // Ocultar la nota original si se está arrastrando
+          const isBeingDragged = mouseState.isDragging && 
+            mouseState.draggedEvent &&
+            mouseState.draggedEvent.pulse === event.pulse &&
+            mouseState.draggedEvent.note === event.note &&
+            mouseState.draggedEvent.velocity === event.velocity;
+
+          return (
+            <div
+              key={index}
+              className={`absolute top-1/2 w-3 h-3 transform -translate-x-1/2 -translate-y-1/2 rotate-45 z-20 cursor-pointer transition-all ${
+                isBeingDragged 
+                  ? 'opacity-30' 
+                  : 'bg-blue-500 hover:bg-blue-600'
+              }`}
+              style={{ left: `${event.position}%` }}
+              title={`Note: ${event.note}, Velocity: ${event.velocity}, Pulse: ${event.pulse}`}
+            ></div>
+          );
+        })}
+
+        {/* Nota fantasma durante drag */}
+        {mouseState.isDragging && mouseState.draggedEvent && (
+          (() => {
+            // Calcular posición con snap to grid
+            const rect = containerRef.current?.getBoundingClientRect();
+            if (!rect) return null;
+            
+            const percentage = Math.max(0, Math.min(100, (mouseState.currentX / rect.width) * 100));
+            const snappedPulse = percentageToPulse(percentage);
+            const snappedPosition = pulseToPercentage(snappedPulse);
+            
+            return (
+              <>
+                {/* Línea guía vertical */}
+                <div
+                  className="absolute top-0 bottom-0 w-0.5 bg-yellow-400 z-25 pointer-events-none opacity-60"
+                  style={{ left: `${snappedPosition}%` }}
+                ></div>
+                
+                {/* Nota fantasma */}
+                <div
+                  className="absolute top-1/2 w-3 h-3 bg-yellow-500 transform -translate-x-1/2 -translate-y-1/2 rotate-45 z-30 pointer-events-none opacity-80 shadow-lg border border-yellow-600"
+                  style={{ left: `${snappedPosition}%` }}
+                  title="Ghost note (drag preview)"
+                ></div>
+              </>
+            );
+          })()
+        )}
         
         {/* Marcadores de beats (negras) */}
         {Array.from({ length: duration + 1 }, (_, i) => (

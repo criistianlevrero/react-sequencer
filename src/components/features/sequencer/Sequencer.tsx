@@ -1,11 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { useSequencer, type PlaybackType, type GridResolution } from '@hooks';
+import { useSequencer } from '@hooks';
 import { usePlayhead } from '@contexts';
-import { Checkbox, Select, Button } from '@components';
+import { Checkbox } from '@components';
 import { SequenceDisplay } from './SequenceDisplay';
+import { SequenceConfig } from './SequenceConfig';
+import { NoteConfig, type SelectedEvent } from './NoteConfig';
 import type { NotePlayerTypeUnion } from '@model';
 import { NotePlayerType } from '@model';
-import { PULSES_PER_QUARTER_NOTE, playerTypeOptions, playbackTypeOptions, gridResolutionOptions } from '@utils';
+import type { SequencerEvent } from '@hooks/useSequencer.types';
+import { PULSES_PER_QUARTER_NOTE } from '@utils';
 
 export interface SequencerProps {
   className?: string;
@@ -14,6 +17,8 @@ export interface SequencerProps {
 export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
   const [selectedPlayerType, setSelectedPlayerType] = useState<NotePlayerTypeUnion>(NotePlayerType.SINE_WAVE);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<SelectedEvent | null>(null);
+  const [originalEvent, setOriginalEvent] = useState<SelectedEvent | null>(null);
   const [state, actions] = useSequencer(4); // 4 quarter notes duration by default
   const { pulseCount, isPlaying } = usePlayhead();
   const [hasInitialLoad, setHasInitialLoad] = React.useState(false);
@@ -43,6 +48,159 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
   const activeEventsCount = useMemo(() => {
     return Array.from(state.events.values()).reduce((total, events) => total + events.length, 0);
   }, [state.events]);
+
+  // Función para cargar la escala de C Major
+  const handleLoadCMajor = () => {
+    const cMajorScale = [60, 62, 64, 65, 67, 69, 71, 72];
+    const totalPulses = state.duration * PULSES_PER_QUARTER_NOTE;
+    
+    const timedEvents = cMajorScale.map((note) => ({
+      pulse: Math.floor(Math.random() * totalPulses),
+      event: {
+        note,
+        velocity: 80,
+        duration: 200,
+        channel: 1,
+        playerType: selectedPlayerType
+      }
+    }));
+    actions.loadSequence(timedEvents);
+  };
+
+  // Función para manejar click en evento del SequenceDisplay
+  const handleEventClick = (eventData: { pulse: number; note: number; velocity: number }) => {
+    // Buscar el evento completo en el state
+    const events = state.events.get(eventData.pulse);
+    if (events) {
+      const fullEvent = events.find(e => e.note === eventData.note);
+      if (fullEvent) {
+        const selectedEventData: SelectedEvent = {
+          pulse: eventData.pulse,
+          note: fullEvent.note,
+          velocity: fullEvent.velocity,
+          duration: fullEvent.duration,
+          channel: fullEvent.channel,
+          playerType: fullEvent.playerType
+        };
+        setSelectedEvent(selectedEventData);
+        setOriginalEvent({ ...selectedEventData }); // Guardar copia del evento original
+      }
+    }
+  };
+
+  // Función para volver a la configuración de secuencia
+  const handleBackToSequence = () => {
+    setSelectedEvent(null);
+    setOriginalEvent(null);
+  };
+
+  // Función para actualizar un evento
+  const handleEventUpdate = (updatedEvent: SelectedEvent) => {
+    if (!originalEvent) return;
+    
+    // Actualizar el evento seleccionado para reflejar los cambios en la UI
+    setSelectedEvent(updatedEvent);
+    
+    // Remover el evento original usando su referencia inicial
+    const events = state.events.get(originalEvent.pulse);
+    if (events) {
+      const updatedEvents = events.filter(e => 
+        !(e.note === originalEvent.note && 
+          e.velocity === originalEvent.velocity && 
+          e.duration === originalEvent.duration &&
+          e.channel === originalEvent.channel &&
+          e.playerType === originalEvent.playerType)
+      );
+      
+      // Agregar el evento actualizado
+      updatedEvents.push({
+        note: updatedEvent.note,
+        velocity: updatedEvent.velocity,
+        duration: updatedEvent.duration,
+        channel: updatedEvent.channel,
+        playerType: updatedEvent.playerType
+      });
+      
+      // Actualizar el state
+      const newEvents = new Map(state.events);
+      if (updatedEvents.length > 0) {
+        newEvents.set(updatedEvent.pulse, updatedEvents);
+      } else {
+        newEvents.delete(updatedEvent.pulse);
+      }
+      
+      // Recrear toda la secuencia
+      actions.clearEvents();
+      const allEvents: Array<{ pulse: number; event: SequencerEvent }> = [];
+      newEvents.forEach((eventArray, pulse) => {
+        eventArray.forEach(event => {
+          allEvents.push({ pulse, event });
+        });
+      });
+      actions.loadSequence(allEvents);
+      
+      // Actualizar el evento original con los nuevos valores para futuras ediciones
+      setOriginalEvent({ ...updatedEvent });
+    }
+  };
+
+  // Función para manejar el drag and drop de eventos
+  const handleEventDrop = (dropData: { 
+    originalPulse: number; 
+    newPulse: number; 
+    note: number; 
+    velocity: number; 
+  }) => {
+    console.log('🎯 Sequencer received drop:', dropData);
+    
+    // Buscar el evento en la posición original
+    const originalEvents = state.events.get(dropData.originalPulse);
+    if (!originalEvents) return;
+    
+    const eventToMove = originalEvents.find(e => 
+      e.note === dropData.note && e.velocity === dropData.velocity
+    );
+    if (!eventToMove) return;
+
+    // Crear nueva configuración de eventos
+    const newEvents = new Map(state.events);
+    
+    // Remover el evento de la posición original
+    const updatedOriginalEvents = originalEvents.filter(e => 
+      !(e.note === dropData.note && e.velocity === dropData.velocity)
+    );
+    
+    if (updatedOriginalEvents.length > 0) {
+      newEvents.set(dropData.originalPulse, updatedOriginalEvents);
+    } else {
+      newEvents.delete(dropData.originalPulse);
+    }
+    
+    // Agregar el evento en la nueva posición
+    const eventsAtNewPosition = newEvents.get(dropData.newPulse) || [];
+    eventsAtNewPosition.push(eventToMove);
+    newEvents.set(dropData.newPulse, eventsAtNewPosition);
+    
+    // Actualizar el state
+    actions.clearEvents();
+    const allEvents: Array<{ pulse: number; event: SequencerEvent }> = [];
+    newEvents.forEach((eventArray, pulse) => {
+      eventArray.forEach(event => {
+        allEvents.push({ pulse, event });
+      });
+    });
+    actions.loadSequence(allEvents);
+    
+    // Si el evento movido está seleccionado, actualizar la selección
+    if (selectedEvent && 
+        selectedEvent.pulse === dropData.originalPulse && 
+        selectedEvent.note === dropData.note && 
+        selectedEvent.velocity === dropData.velocity) {
+      const updatedSelection = { ...selectedEvent, pulse: dropData.newPulse };
+      setSelectedEvent(updatedSelection);
+      setOriginalEvent(updatedSelection);
+    }
+  };
 
   // Calcular posiciones de grilla y eventos para la representación gráfica
   const visualData = useMemo(() => {
@@ -137,108 +295,30 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
 
       {/* Zona Intermedia: Configuración (colapsable) */}
       {isExpanded && (
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {/* Player Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Player Type
-              </label>
-              <Select
-                value={selectedPlayerType}
-                onChange={(value) => setSelectedPlayerType(value as NotePlayerTypeUnion)}
-                options={playerTypeOptions}
-              />
-            </div>
-
-            {/* Playback Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Playback Mode
-              </label>
-              <Select
-                value={state.playbackType}
-                onChange={(value) => actions.setPlaybackType(value as PlaybackType)}
-                options={playbackTypeOptions}
-              />
-            </div>
-
-            {/* Grid Resolution */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Grid Resolution
-              </label>
-              <Select
-                value={state.gridResolution.toString()}
-                onChange={(value) => actions.setGridResolution(Number(value) as GridResolution)}
-                options={gridResolutionOptions}
-              />
-            </div>
-
-            {/* Duration */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Duration (Quarter Notes)
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="range"
-                  min="1"
-                  max="16"
-                  value={state.duration}
-                  onChange={(e) => actions.setDuration(Number(e.target.value))}
-                  className="flex-1"
-                />
-                <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded min-w-[40px] text-center">
-                  {state.duration}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Controls */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Checkbox
-                checked={state.isSnapToGrid}
-                onChange={actions.setSnapToGrid}
-                label="Snap to Grid"
-              />
-            </div>
-            
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={actions.clearEvents}
-                size="sm"
-              >
-                Clear All
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const cMajorScale = [60, 62, 64, 65, 67, 69, 71, 72];
-                  const totalPulses = state.duration * PULSES_PER_QUARTER_NOTE;
-                  
-                  const timedEvents = cMajorScale.map((note) => ({
-                    pulse: Math.floor(Math.random() * totalPulses), // Posición aleatoria dentro de la duración
-                    event: {
-                      note,
-                      velocity: 80,
-                      duration: 200,
-                      channel: 1,
-                      playerType: selectedPlayerType
-                    }
-                  }));
-                  actions.loadSequence(timedEvents);
-                }}
-                size="sm"
-              >
-                Load C Major
-              </Button>
-            </div>
-          </div>
-        </div>
+        <>
+          {selectedEvent ? (
+            <NoteConfig
+              selectedEvent={selectedEvent}
+              onBack={handleBackToSequence}
+              onEventUpdate={handleEventUpdate}
+            />
+          ) : (
+            <SequenceConfig
+              selectedPlayerType={selectedPlayerType}
+              onPlayerTypeChange={setSelectedPlayerType}
+              playbackType={state.playbackType}
+              onPlaybackTypeChange={actions.setPlaybackType}
+              gridResolution={state.gridResolution}
+              onGridResolutionChange={actions.setGridResolution}
+              duration={state.duration}
+              onDurationChange={actions.setDuration}
+              isSnapToGrid={state.isSnapToGrid}
+              onSnapToGridChange={actions.setSnapToGrid}
+              onClearEvents={actions.clearEvents}
+              onLoadCMajor={handleLoadCMajor}
+            />
+          )}
+        </>
       )}
 
       {/* Zona Inferior: Representación Gráfica */}
@@ -249,6 +329,8 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
         playbackType={state.playbackType}
         pulseCount={pulseCount}
         isPlaying={isPlaying}
+        onEventClick={handleEventClick}
+        onEventDrop={handleEventDrop}
       />
     </div>
   );
