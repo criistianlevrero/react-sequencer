@@ -16,6 +16,7 @@ export interface SequencerProps {
 
 export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
   const [selectedPlayerType, setSelectedPlayerType] = useState<NotePlayerTypeUnion>(NotePlayerType.SINE_WAVE);
+  const [midiChannel, setMidiChannel] = useState(1);
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<SelectedEvent | null>(null);
   const [originalEvent, setOriginalEvent] = useState<SelectedEvent | null>(null);
@@ -35,7 +36,7 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
           note,
           velocity: 80,
           duration: 200,
-          channel: 1,
+          channel: midiChannel,
           playerType: selectedPlayerType
         }
       }));
@@ -43,11 +44,53 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
       actions.loadSequence(timedEvents);
       setHasInitialLoad(true);
     }
-  }, [hasInitialLoad, selectedPlayerType, actions, state.duration]);
+  }, [hasInitialLoad, selectedPlayerType, midiChannel, actions, state.duration]);
+
+  // Deseleccionar nota cuando el sequencer se contrae
+  React.useEffect(() => {
+    if (!isExpanded && selectedEvent) {
+      setSelectedEvent(null);
+      setOriginalEvent(null);
+    }
+  }, [isExpanded, selectedEvent]);
 
   const activeEventsCount = useMemo(() => {
     return Array.from(state.events.values()).reduce((total, events) => total + events.length, 0);
   }, [state.events]);
+
+  // Función para agregar una nueva nota en un pulso específico
+  const handleAddNote = (pulse: number) => {
+    console.log('🎵 Adding new C4 note at pulse:', pulse);
+    
+    // Crear nueva nota C4 con configuración del sequencer
+    const newEvent = {
+      pulse,
+      event: {
+        note: 60, // C4
+        velocity: 80, // Velocity por defecto
+        duration: 200, // Duración por defecto
+        channel: midiChannel,
+        playerType: selectedPlayerType
+      }
+    };
+    
+    // Agregar la nota a la secuencia existente
+    const events = state.events.get(pulse) || [];
+    events.push(newEvent.event);
+    
+    const newEvents = new Map(state.events);
+    newEvents.set(pulse, events);
+    
+    // Recrear toda la secuencia
+    actions.clearEvents();
+    const allEvents: Array<{ pulse: number; event: SequencerEvent }> = [];
+    newEvents.forEach((eventArray, eventPulse) => {
+      eventArray.forEach(event => {
+        allEvents.push({ pulse: eventPulse, event });
+      });
+    });
+    actions.loadSequence(allEvents);
+  };
 
   // Función para cargar la escala de C Major
   const handleLoadCMajor = () => {
@@ -60,7 +103,7 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
         note,
         velocity: 80,
         duration: 200,
-        channel: 1,
+        channel: midiChannel,
         playerType: selectedPlayerType
       }
     }));
@@ -78,12 +121,15 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
           pulse: eventData.pulse,
           note: fullEvent.note,
           velocity: fullEvent.velocity,
-          duration: fullEvent.duration,
-          channel: fullEvent.channel,
-          playerType: fullEvent.playerType
+          duration: fullEvent.duration
         };
         setSelectedEvent(selectedEventData);
         setOriginalEvent({ ...selectedEventData }); // Guardar copia del evento original
+        
+        // Si el secuenciador está contraído, expandirlo automáticamente
+        if (!isExpanded) {
+          setIsExpanded(true);
+        }
       }
     }
   };
@@ -107,18 +153,16 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
       const updatedEvents = events.filter(e => 
         !(e.note === originalEvent.note && 
           e.velocity === originalEvent.velocity && 
-          e.duration === originalEvent.duration &&
-          e.channel === originalEvent.channel &&
-          e.playerType === originalEvent.playerType)
+          e.duration === originalEvent.duration)
       );
       
-      // Agregar el evento actualizado
+      // Agregar el evento actualizado con playerType y channel del sequencer
       updatedEvents.push({
         note: updatedEvent.note,
         velocity: updatedEvent.velocity,
         duration: updatedEvent.duration,
-        channel: updatedEvent.channel,
-        playerType: updatedEvent.playerType
+        channel: midiChannel,
+        playerType: selectedPlayerType
       });
       
       // Actualizar el state
@@ -314,6 +358,8 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
               onDurationChange={actions.setDuration}
               isSnapToGrid={state.isSnapToGrid}
               onSnapToGridChange={actions.setSnapToGrid}
+              midiChannel={midiChannel}
+              onMidiChannelChange={setMidiChannel}
               onClearEvents={actions.clearEvents}
               onLoadCMajor={handleLoadCMajor}
             />
@@ -330,8 +376,10 @@ export const Sequencer: React.FC<SequencerProps> = ({ className = '' }) => {
         pulseCount={pulseCount}
         isPlaying={isPlaying}
         isSnapToGrid={state.isSnapToGrid}
+        selectedEvent={selectedEvent}
         onEventClick={handleEventClick}
         onEventDrop={handleEventDrop}
+        onAddNote={handleAddNote}
       />
     </div>
   );

@@ -21,6 +21,7 @@ export interface SequenceDisplayProps {
   pulseCount: number;
   isPlaying: boolean;
   isSnapToGrid: boolean;
+  selectedEvent?: { pulse: number; note: number; velocity: number } | null;
   onEventClick?: (eventData: { pulse: number; note: number; velocity: number }) => void;
   onEventDrop?: (eventData: { 
     originalPulse: number; 
@@ -28,6 +29,7 @@ export interface SequenceDisplayProps {
     note: number; 
     velocity: number; 
   }) => void;
+  onAddNote?: (pulse: number) => void;
   className?: string;
 }
 
@@ -55,8 +57,10 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
   pulseCount,
   isPlaying,
   isSnapToGrid,
+  selectedEvent,
   onEventClick,
   onEventDrop,
+  onAddNote,
   className = ''
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -263,6 +267,18 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
           note: eventAtStartPosition.note,
           velocity: eventAtStartPosition.velocity
         });
+      } else if (!eventAtStartPosition && onAddNote && isValidClick) {
+        // Click en espacio vacío - agregar nueva nota C4
+        const { percentage } = getRelativePosition({ clientX: mouseState.startX + (containerRef.current?.getBoundingClientRect().left || 0), clientY: mouseState.startY + (containerRef.current?.getBoundingClientRect().top || 0) } as React.MouseEvent);
+        const targetPulse = percentageToPulse(percentage);
+        
+        console.log('➕ Adding new note at empty space:', {
+          percentage: percentage.toFixed(2),
+          targetPulse,
+          clickDuration: `${clickDuration}ms`
+        });
+        
+        onAddNote(targetPulse);
       } else if (!isValidClick) {
         console.log('⏱️ Click too long, ignoring:', { clickDuration: `${clickDuration}ms` });
       }
@@ -276,7 +292,7 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
       currentY: 0,
       draggedEvent: null
     }));
-  }, [mouseState, getRelativePosition, percentageToPulse, onEventDrop, gridResolution, isSnapToGrid, pulseToPercentage, getEventAtPosition, onEventClick]);
+  }, [mouseState, getRelativePosition, percentageToPulse, onEventDrop, gridResolution, isSnapToGrid, pulseToPercentage, getEventAtPosition, onEventClick, onAddNote]);
 
   // Prevenir el comportamiento por defecto del drag para evitar interferencias
   const handleDragStart = useCallback((event: React.DragEvent) => {
@@ -315,16 +331,24 @@ export const SequenceDisplay: React.FC<SequenceDisplayProps> = ({
             mouseState.draggedEvent.note === event.note &&
             mouseState.draggedEvent.velocity === event.velocity;
 
+          // Verificar si esta nota está seleccionada
+          const isSelected = selectedEvent && 
+            selectedEvent.pulse === event.pulse &&
+            selectedEvent.note === event.note &&
+            selectedEvent.velocity === event.velocity;
+
           return (
             <div
               key={index}
               className={`absolute top-1/2 w-3 h-3 transform -translate-x-1/2 -translate-y-1/2 rotate-45 z-20 cursor-pointer transition-all ${
                 isBeingDragged 
                   ? 'opacity-30' 
-                  : 'bg-blue-500 hover:bg-blue-600'
+                  : isSelected
+                    ? 'bg-green-500 hover:bg-green-600 ring-2 ring-green-300 ring-offset-1'
+                    : 'bg-blue-500 hover:bg-blue-600'
               }`}
               style={{ left: `${event.position}%` }}
-              title={`Note: ${event.note}, Velocity: ${event.velocity}, Pulse: ${event.pulse}`}
+              title={`Note: ${event.note}, Velocity: ${event.velocity}, Pulse: ${event.pulse}${isSelected ? ' (Selected)' : ''}`}
             ></div>
           );
         })}

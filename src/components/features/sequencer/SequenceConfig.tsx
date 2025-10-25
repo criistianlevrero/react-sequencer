@@ -2,6 +2,7 @@ import React from 'react';
 import { Checkbox, Select, Button } from '@components';
 import type { PlaybackType, GridResolution } from '@hooks';
 import type { NotePlayerTypeUnion } from '@model';
+import { NotePlayerType } from '@model';
 import { playerTypeOptions, playbackTypeOptions, gridResolutionOptions } from '@utils';
 
 export interface SequenceConfigProps {
@@ -16,6 +17,8 @@ export interface SequenceConfigProps {
   onDurationChange: (value: number) => void;
   isSnapToGrid: boolean;
   onSnapToGridChange: (value: boolean) => void;
+  midiChannel: number;
+  onMidiChannelChange: (value: number) => void;
   
   // Actions
   onClearEvents: () => void;
@@ -33,6 +36,8 @@ export const SequenceConfig: React.FC<SequenceConfigProps> = ({
   onDurationChange,
   isSnapToGrid,
   onSnapToGridChange,
+  midiChannel,
+  onMidiChannelChange,
   onClearEvents,
   onLoadCMajor
 }) => {
@@ -50,6 +55,28 @@ export const SequenceConfig: React.FC<SequenceConfigProps> = ({
             options={playerTypeOptions}
           />
         </div>
+
+        {/* MIDI Channel - Solo visible si playerType es MIDI_OUTPUT */}
+        {selectedPlayerType === NotePlayerType.MIDI_OUTPUT && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              MIDI Channel
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min="1"
+                max="16"
+                value={midiChannel}
+                onChange={(e) => onMidiChannelChange(Number(e.target.value))}
+                className="flex-1"
+              />
+              <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded min-w-[40px] text-center">
+                {midiChannel}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Playback Type */}
         <div>

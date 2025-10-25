@@ -1,15 +1,11 @@
 import React from 'react';
-import { Button, Select } from '@components';
-import type { NotePlayerTypeUnion } from '@model';
-import { playerTypeOptions } from '@utils';
+import { Button } from '@components';
 
 export interface SelectedEvent {
   pulse: number;
   note: number;
   velocity: number;
   duration: number;
-  channel: number;
-  playerType: NotePlayerTypeUnion;
 }
 
 export interface NoteConfigProps {
@@ -110,38 +106,6 @@ export const NoteConfig: React.FC<NoteConfigProps> = ({
               {selectedEvent.duration}
             </span>
           </div>
-        </div>
-
-        {/* Channel */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            MIDI Channel
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="range"
-              min="1"
-              max="16"
-              value={selectedEvent.channel}
-              onChange={(e) => updateField('channel', Number(e.target.value))}
-              className="flex-1"
-            />
-            <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded min-w-[40px] text-center">
-              {selectedEvent.channel}
-            </span>
-          </div>
-        </div>
-
-        {/* Player Type */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Player Type
-          </label>
-          <Select
-            value={selectedEvent.playerType}
-            onChange={(value) => updateField('playerType', value as NotePlayerTypeUnion)}
-            options={playerTypeOptions}
-          />
         </div>
       </div>
     </div>
